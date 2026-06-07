@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+"""
+Appendix A: Image-based Blackboard Dust Residue Quantitative Analysis Program
+Designed for the National Youth Scientific Exploration Modeling Capability Competition.
+"""
+import cv2
+import numpy as np
+import os
+
+def calculate_residue_index(image_path):
+    """
+    Quantifies the brightness (gray value) of the blackboard surface.
+    Higher brightness represents a larger amount of chalk dust residue.
+    """
+    # 1. Load the experimental image
+    img = cv2.imread(image_path)
+    if img is None:
+        print(f"Error: Unable to read file {image_path}")
+        return None
+        
+    # 2. Convert to grayscale to eliminate environmental color interference
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # 3. Crop ROI (Region of Interest) to exclude blackboard borders
+    h, w = gray.shape
+    y1, y2 = int(h * 0.2), int(h * 0.8)
+    x1, x2 = int(w * 0.2), int(w * 0.8)
+    roi = gray[y1:y2, x1:x2]
+    
+    # 4. Calculate the average grayscale value
+    brightness_val = np.mean(roi)
+    return round(float(brightness_val), 2)
+
+if __name__ == "__main__":
+    # Example usage for batch processing
+    print("=== Processing Experimental Images ===")
+    samples = ["dry_wipe_0.jpg", "wet_wipe_0.45.jpg"]
+    
+    # Create mock dummy results for illustration
+    for sample in samples:
+        # In actual use, make sure the images exist in the folder
+        val = calculate_residue_index(sample)
+        if val is not None:
+            print(f"Sample: {sample} | Quantified Residue: {val}")
